@@ -1,23 +1,11 @@
-import openai
-from flask import Flask, request, jsonify
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-app = Flask(__name__)
+tokenizer = AutoTokenizer.from_pretrained("facebook/bart-large-cnn")
+model = AutoModelForSeq2SeqLM.from_pretrained("facebook/bart-large-cnn")
 
-openai.api_key = "YOUR_OPENAI_API_KEY"
-
-@app.route("/chat", methods=["POST"])
-def chat():
-    user_input = request.json.get("user_input")
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": user_input}],
-            temperature=0.7
-        )
-        answer = response['choices'][0]['message']['content']
-        return jsonify({"response": answer})
-    except Exception as e:
-        return jsonify({"error": str(e)})
-
-if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+def generate_response(context, query):
+    input_text = f"Context: {context} Query: {query}"
+    inputs = tokenizer(input_text, return_tensors="pt", truncation=True, max_length=512)
+    outputs = model.generate(**inputs, max_length=100, num_beams=3, early_stopping=True)
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return response
