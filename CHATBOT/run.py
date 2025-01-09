@@ -1,7 +1,7 @@
-from src.pdf_extraction import extract_text_from_pdfs
-from src.embedding import generate_embeddings
-from src.retrieval import retrieve_documents
-from src.chatbot import generate_response
+from pdf_extract import extract_text_from_pdfs
+from embedding import generate_embeddings
+from retrieval import retrieve_documents
+from chatbot import generate_response
 
 pdf_paths = ['file1.pdf', 'file2.pdf']
 documents = extract_text_from_pdfs(pdf_paths)
